@@ -56,7 +56,6 @@ async function runTests() {
             console.log(`[DEBUG] Available collections: ${collections.map(c => c.name).join(', ')}`);
         }
 
-        // 1. Signup
         const signupRes = await client.post('/api/org/signup', {
             userName: 'Primary Admin',
             userEmail: adminEmail,
