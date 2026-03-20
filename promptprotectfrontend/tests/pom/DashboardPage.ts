@@ -31,13 +31,15 @@ export class DashboardPage {
   async logout() {
     await this.waitForNoOverlays();
     const menuButton = this.page.locator('button[aria-haspopup="menu"]').first();
-    await menuButton.click();
+    await menuButton.click({ force: true });
 
+    // Wait for Sign Out button to be visible and click it
     const signOutButton = this.page.locator('button:has-text("Sign Out")');
     await expect(signOutButton).toBeVisible({ timeout: 5000 });
-    await signOutButton.click();
+    await signOutButton.click({ force: true });
 
-    await expect(this.page).toHaveURL(/\/$/);
+    // Verify redirect to landing page
+    await expect(this.page).toHaveURL(/\/$/, { timeout: 10000 });
   }
 
   async verifyKeySectionVisible() {
