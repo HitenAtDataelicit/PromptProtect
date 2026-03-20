@@ -33,7 +33,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Backend tests will be implemented soon\" && exit 0"
+    "test": "node scripts/test-flow.js"
   },
   "keywords": [],
   "author": "",

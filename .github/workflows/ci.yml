@@ -10,6 +10,12 @@ jobs:
   test-and-verify:
     runs-on: ubuntu-latest
 
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
     steps:
     - uses: actions/checkout@v4
 
@@ -31,10 +37,23 @@ jobs:
       working-directory: ./PromptprotectBackend
       run: |
         echo "${{ secrets.BACKEND_ENV }}" > .env
+        # Ensure BASE_URL and MONGODB_URI are set for CI if not in secret
+        echo "BASE_URL=http://localhost:5005" >> .env
+        echo "MONGODB_URI=mongodb://localhost:27017/test_promptprotect" >> .env
+
+    - name: Start Backend Server
+      working-directory: ./PromptprotectBackend
+      run: npm start &
+      env:
+        NODE_ENV: test
+
+    - name: Wait for Backend
+      run: |
+        npx wait-on http://localhost:5005 --timeout 30000
 
     - name: Run Backend Tests
       working-directory: ./PromptprotectBackend
-      run: npm test || echo "No tests defined yet"
+      run: node scripts/test-flow.js
 
     # Frontend Setup & Test
     - name: Install Frontend Dependencies
