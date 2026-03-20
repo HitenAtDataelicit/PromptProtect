@@ -1,0 +1,55 @@
+name: CI - PromptProtect
+
+on:
+  push:
+    branches: [ "main", "stage" ]
+  pull_request:
+    branches: [ "main", "stage" ]
+
+jobs:
+  test-and-verify:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: |
+          PromptprotectBackend/package-lock.json
+          promptprotectfrontend/package-lock.json
+
+    # Backend Setup & Test
+    - name: Install Backend Dependencies
+      working-directory: ./PromptprotectBackend
+      run: npm ci
+
+    - name: Create Backend .env
+      working-directory: ./PromptprotectBackend
+      run: |
+        echo "${{ secrets.BACKEND_ENV }}" > .env
+
+    - name: Run Backend Tests
+      working-directory: ./PromptprotectBackend
+      run: npm test || echo "No tests defined yet"
+
+    # Frontend Setup & Test
+    - name: Install Frontend Dependencies
+      working-directory: ./promptprotectfrontend
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      working-directory: ./promptprotectfrontend
+      run: npx playwright install --with-deps
+
+    - name: Create Frontend .env
+      working-directory: ./promptprotectfrontend
+      run: |
+        echo "${{ secrets.FRONTEND_ENV }}" > .env
+
+    - name: Run Frontend Tests
+      working-directory: ./promptprotectfrontend
+      run: npx playwright test

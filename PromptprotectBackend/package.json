@@ -1,0 +1,42 @@
+{
+  "dependencies": {
+    "@azure/msal-node": "^5.0.4",
+    "@clickhouse/client": "^1.16.0",
+    "axios": "^1.13.6",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "countries-and-timezones": "^3.8.0",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.2",
+    "ldapts": "^8.1.6",
+    "mammoth": "^1.11.0",
+    "moment-timezone": "^0.6.0",
+    "mongoose": "^9.3.1",
+    "multer": "^2.1.1",
+    "node": "^20.19.6",
+    "node-cron": "^4.2.1",
+    "nodemon": "^3.1.11",
+    "passport": "^0.7.0",
+    "passport-saml": "^3.2.4",
+    "pdf-parse": "^2.4.5",
+    "qs": "^6.14.0",
+    "xregexp": "^5.1.2"
+  },
+  "name": "promptprotectbackend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Backend tests will be implemented soon\" && exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

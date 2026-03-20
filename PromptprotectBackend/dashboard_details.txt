@@ -1,0 +1,67 @@
+1. Executive Security Posture
+Total events
+Scanned events
+Detected events
+Blocked events
+Redacted events
+Overall risk score
+Severity distribution
+Event trend (timechart)
+
+2. Sensitive Data & Exposure
+PII count
+PHI count
+PCI count
+Secrets count
+Crypto data count
+Custom entities count
+Category-wise breakdown
+Classification trend (timechart)
+
+3. Risk & Threat Intelligence
+Critical events
+High risk events
+Medium risk events
+Low risk events
+Risk score by category
+Severity trend (timechart)
+Daily detection trend
+Weekly risk trend
+Peak violation hours
+Anomaly spikes
+Emerging entity types
+
+4. User, Policy & Behavior Insights
+Top users by detections
+Users with critical violations
+User activity trend
+User-wise risk score
+Blocked actions by user
+
+5. Channels, AI Platforms & Controls
+ChatGPT
+Copilot
+Claude
+Gemini
+Perplexity
+Browser (Omnibox / Google.com)
+Source-wise detection count
+Source-wise risk level
+Blocked events
+Fully redacted events
+Partially redacted events
+Allowed events
+Action distribution
+Action trend (timechart)
+
+6. Incidents, Audit & Compliance
+Active alerts
+Critical incidents
+Incident timeline
+Resolution status
+SLA breach indicators
+Audit log events
+User action history
+Policy change history
+Compliance-ready reports
+Export (CSV / PDF)

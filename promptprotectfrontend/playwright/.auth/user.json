@@ -1,0 +1,15 @@
+{
+  "cookies": [
+    {
+      "name": "jwtToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWJjYzNhMmU4OWE5Y2MyMzYxNDBhMzEiLCJ1c2VyRW1haWwiOiJhZG1pbkB0ZXN0LmNvbSIsInVzZXJSb2xlIjpbIk9SR19BRE1JTiJdLCJvcmdJZCI6IjY5YmNjM2EyZTg5YTljYzIzNjE0MGEyZiIsIm9yZ0tleSI6IjlkMzcwNjQ0MjcyMzYwMzNmYjkxYTdiNmRmODIyNWYxYTBhMWE4OTk5ZmI3NTBmMGFmMDgzYmE5NmI1MjU4ZmIiLCJvcmdOYW1lIjoiVGVzdCBPcmciLCJpYXQiOjE3NzM5Nzg1MzUsImV4cCI6MTc3Mzk4OTMzNX0.d5iCIy6TSWyg5bg0LefWIrX37qKd8v5nGnQyF1NL5vM",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1773989335.906339,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    }
+  ],
+  "origins": []
+}
