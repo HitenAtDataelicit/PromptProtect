@@ -10,12 +10,6 @@ jobs:
   test-and-verify:
     runs-on: self-hosted
 
-    services:
-      mongodb:
-        image: mongo:latest
-        ports:
-          - 27017:27017
-
     steps:
     - uses: actions/checkout@v4
 
@@ -37,9 +31,8 @@ jobs:
       working-directory: ./PromptprotectBackend
       run: |
         echo "${{ secrets.BACKEND_ENV }}" > .env
-        # Ensure BASE_URL and MONGODB_URI are set for CI if not in secret
+        # Override for the server's local environment
         echo "BASE_URL=http://localhost:5005" >> .env
-        echo "MONGODB_URI=mongodb://localhost:27017/test_promptprotect" >> .env
 
     - name: Start Backend Server
       working-directory: ./PromptprotectBackend
