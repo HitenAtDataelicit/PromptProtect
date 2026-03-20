@@ -128,6 +128,7 @@ app.get("/extensions/promptprotect_extension.crx", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
+  console.log("helth endpoint hit");
   res.status(200).send("OK");
 });
 

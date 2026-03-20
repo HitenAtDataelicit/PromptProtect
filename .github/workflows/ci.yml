@@ -8,7 +8,7 @@ on:
 
 jobs:
   test-and-verify:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     services:
       mongodb:
