@@ -7,9 +7,11 @@ on:
     branches: [ "main", "stage" ]
 
 jobs:
-  test-and-verify:
-    runs-on: self-hosted
-
+  test:
+    name: Test and Verify
+    # Run tests ONLY on push/PR to stage branch
+    if: github.event.ref == 'refs/heads/stage' || github.base_ref == 'stage'
+    runs-on: [self-hosted, Stage]
     steps:
     - uses: actions/checkout@v4
 
@@ -22,20 +24,19 @@ jobs:
           PromptprotectBackend/package-lock.json
           promptprotectfrontend/package-lock.json
 
-    # Backend Setup & Test
     - name: Install Backend Dependencies
       working-directory: ./PromptprotectBackend
       run: npm ci
 
-    - name: Create Backend .env
+    - name: Create Test Backend .env
       working-directory: ./PromptprotectBackend
       run: |
         cat << 'EOF' > .env
         ${{ secrets.BACKEND_ENV }}
         EOF
         echo "" >> .env
-        # Override for the server's local environment
         echo "BASE_URL=http://localhost:5005" >> .env
+        echo "PORT=5005" >> .env
 
     - name: Start Backend Server
       working-directory: ./PromptprotectBackend
@@ -49,17 +50,13 @@ jobs:
 
     - name: Run Backend Tests
       working-directory: ./PromptprotectBackend
-      run: |
-        echo "Contents of .env:"
-        cat .env
-        node scripts/test-flow.js
+      run: node scripts/test-flow.js
 
-    # Frontend Setup & Test
     - name: Install Frontend Dependencies
       working-directory: ./promptprotectfrontend
       run: npm ci
 
-    - name: Install Playwright Dependencies (Amazon Linux 2023)
+    - name: Install Playwright Dependencies
       run: |
         sudo dnf install -y alsa-lib at-spi2-atk atk cups-libs dbus-libs expat libX11 libXcomposite libXcursor libXdamage libXext libXfixes libXi libXrandr libXrender libXScrnSaver libXtst pango mesa-libgbm nspr nss nss-util libxkbcommon libX11-xcb libxcb libdrm gtk3
 
@@ -67,7 +64,7 @@ jobs:
       working-directory: ./promptprotectfrontend
       run: npx playwright install chromium
 
-    - name: Create Frontend .env
+    - name: Create Test Frontend .env
       working-directory: ./promptprotectfrontend
       run: |
         cat << 'EOF' > .env
@@ -77,3 +74,65 @@ jobs:
     - name: Run Frontend Tests
       working-directory: ./promptprotectfrontend
       run: npx playwright test
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/stage'
+    runs-on: [self-hosted, Stage]
+    environment: staging
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy Staging (Backend)
+      working-directory: ./PromptprotectBackend
+      run: |
+        npm install
+        cat << 'EOF' > .env
+        ${{ secrets.BACKEND_ENV }}
+        EOF
+
+    - name: Deploy Staging (Frontend)
+      working-directory: ./promptprotectfrontend
+      run: |
+        npm install
+        cat << 'EOF' > .env
+        ${{ secrets.FRONTEND_ENV }}
+        EOF
+        npm run build
+
+  deploy-production:
+    name: Deploy to Production
+    # No 'needs' dependency here, so it skips tests on main branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Production]
+    environment: production
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Prepare Production Directory
+      run: |
+        sudo mkdir -p /opt/PromptProtect/Dev
+        sudo chown -R $USER:$USER /opt/PromptProtect/Dev
+
+    - name: Sync Files to Production
+      run: |
+        # Syncing everything EXCEPT .git and node_modules
+        rsync -avz --exclude '.git' --exclude 'node_modules' ./ /opt/PromptProtect/Dev
+
+    - name: Deploy Production (Backend)
+      working-directory: /opt/PromptProtect/Dev/PromptprotectBackend
+      run: |
+        npm install --production
+        cat << 'EOF' > .env
+        ${{ secrets.BACKEND_ENV }}
+        EOF
+
+    - name: Deploy Production (Frontend)
+      working-directory: /opt/PromptProtect/Dev/promptprotectfrontend
+      run: |
+        npm install
+        cat << 'EOF' > .env
+        ${{ secrets.FRONTEND_ENV }}
+        EOF
+        npm run build
