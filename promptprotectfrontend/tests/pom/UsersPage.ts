@@ -33,7 +33,6 @@ export class UsersPage {
 
     await expect(this.page.locator(`text=${name}`)).toBeVisible();
   }
-
   async deleteUser(name: string) {
     const row = this.page.locator('tr', { hasText: name });
     await row.locator('button:has-text("Delete")').click();
