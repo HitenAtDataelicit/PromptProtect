@@ -61,7 +61,7 @@ jobs:
 
     - name: Install Playwright Dependencies (Amazon Linux 2023)
       run: |
-        sudo dnf install -y alsa-lib at-spi2-atk atk cups-libs dbus-libs expat libX11 libXcomposite libXcursor libXdamage libXext libXfixes libXi libXrandr libXrender libXScrnSaver libXtst pango mesa-libgbm nspr nss nss-util
+        sudo dnf install -y alsa-lib at-spi2-atk atk cups-libs dbus-libs expat libX11 libXcomposite libXcursor libXdamage libXext libXfixes libXi libXrandr libXrender libXScrnSaver libXtst pango mesa-libgbm nspr nss nss-util libxkbcommon libX11-xcb libxcb libdrm gtk3
 
     - name: Install Playwright Browsers
       working-directory: ./promptprotectfrontend
