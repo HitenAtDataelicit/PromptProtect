@@ -83,6 +83,11 @@ jobs:
     environment: staging
     steps:
     - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
     
     - name: Deploy Staging (Backend)
       working-directory: ./PromptprotectBackend
@@ -109,6 +114,11 @@ jobs:
     environment: production
     steps:
     - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
     
     - name: Prepare Production Directory
       run: |
