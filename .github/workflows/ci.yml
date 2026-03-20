@@ -30,7 +30,9 @@ jobs:
     - name: Create Backend .env
       working-directory: ./PromptprotectBackend
       run: |
-        echo "${{ secrets.BACKEND_ENV }}" > .env
+        cat << 'EOF' > .env
+        ${{ secrets.BACKEND_ENV }}
+        EOF
         echo "" >> .env
         # Override for the server's local environment
         echo "BASE_URL=http://localhost:5005" >> .env
@@ -68,7 +70,9 @@ jobs:
     - name: Create Frontend .env
       working-directory: ./promptprotectfrontend
       run: |
-        echo "${{ secrets.FRONTEND_ENV }}" > .env
+        cat << 'EOF' > .env
+        ${{ secrets.FRONTEND_ENV }}
+        EOF
 
     - name: Run Frontend Tests
       working-directory: ./promptprotectfrontend

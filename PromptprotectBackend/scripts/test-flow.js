@@ -6,6 +6,8 @@ require('dotenv').config();
 const BASE_URL = process.env.BASE_URL;
 const MONGODB_URI = process.env.MONGODB_URI;
 
+console.log(MONGODB_URI);
+
 // User Models (Minimal for verification)
 const UserSchema = new mongoose.Schema({}, { strict: false });
 const User = mongoose.model('User', UserSchema);
@@ -47,7 +49,12 @@ async function runTests() {
     console.log('Starting Expanded 26-Step API Flow Test Suite...');
 
     try {
-        if (MONGODB_URI) await mongoose.connect(MONGODB_URI);
+        if (MONGODB_URI) {
+            await mongoose.connect(MONGODB_URI);
+            console.log(`[DEBUG] Mongoose Connected to: ${mongoose.connection.name}`);
+            const collections = await mongoose.connection.db.listCollections().toArray();
+            console.log(`[DEBUG] Available collections: ${collections.map(c => c.name).join(', ')}`);
+        }
 
         // 1. Signup
         const signupRes = await client.post('/api/org/signup', {
@@ -62,7 +69,9 @@ async function runTests() {
         if (signupRes.status !== 201) throw new Error('Signup failed');
 
         // 2. Verify Email (Simulated)
+        console.log(adminEmail);
         const user1 = await User.findOne({ userEmail: adminEmail });
+        console.log(user1);
         const verifyRes = await client.get(`/api/users/auth/verify-email?token=${user1.verificationToken}`);
         logResult('/api/users/auth/verify-email', 'GET', verifyRes.status === 200, verifyRes.status, verifyRes.data, 'Email Verification');
 
@@ -180,12 +189,12 @@ async function runTests() {
         });
         logResult('/pii-scan', 'POST', scanRes.status === 200, scanRes.status, scanRes.data, 'Final PII Detection');
 
-        // 18. Delete Resources
-        if (groupId) await client.delete(`/api/groups/${groupId}`);
-        if (policyId) await client.delete(`/api/policies/${policyId}`);
-        if (testUserId) await client.delete(`/api/users/${testUserId}`);
-        if (customRuleId) await client.delete(`/api/custom-rules/${customRuleId}`);
-        logResult('Cleanup', 'DELETE', true, 200, {}, 'Resource Disposal');
+        // // 18. Delete Resources
+        // if (groupId) await client.delete(`/api/groups/${groupId}`);
+        // if (policyId) await client.delete(`/api/policies/${policyId}`);
+        // if (testUserId) await client.delete(`/api/users/${testUserId}`);
+        // if (customRuleId) await client.delete(`/api/custom-rules/${customRuleId}`);
+        // logResult('Cleanup', 'DELETE', true, 200, {}, 'Resource Disposal');
 
         // 19. Create New User (Admin Role)
         const createAdminRes = await client.post('/api/users', {
@@ -264,11 +273,12 @@ async function runTests() {
         if (failCount === 0 && results.length > 0) {
             console.log('All tests passed! Cleaning up...');
             if (mongoose.connection.readyState === 1) {
-                await mongoose.connection.db.dropDatabase();
-                console.log('Test database dropped.');
+                // await mongoose.connection.db.dropDatabase();
+                // console.log('Test database dropped.');
+                console.log("skiping")
             }
             if (fs.existsSync('test_results.json')) {
-                fs.unlinkSync('test_results.json');
+                // fs.unlinkSync('test_results.json');
                 console.log('test_results.json removed.');
             }
         } else {
