@@ -8,7 +8,7 @@ on:
 
 jobs:
   test-and-verify:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v4
@@ -30,25 +30,49 @@ jobs:
     - name: Create Backend .env
       working-directory: ./PromptprotectBackend
       run: |
-        echo "${{ secrets.BACKEND_ENV }}" > .env
+        cat << 'EOF' > .env
+        ${{ secrets.BACKEND_ENV }}
+        EOF
+        echo "" >> .env
+        # Override for the server's local environment
+        echo "BASE_URL=http://localhost:5005" >> .env
+
+    - name: Start Backend Server
+      working-directory: ./PromptprotectBackend
+      run: npm start &
+      env:
+        NODE_ENV: test
+
+    - name: Wait for Backend
+      run: |
+        npx wait-on http://127.0.0.1:5005/health --timeout 60000
 
     - name: Run Backend Tests
       working-directory: ./PromptprotectBackend
-      run: npm test || echo "No tests defined yet"
+      run: |
+        echo "Contents of .env:"
+        cat .env
+        node scripts/test-flow.js
 
     # Frontend Setup & Test
     - name: Install Frontend Dependencies
       working-directory: ./promptprotectfrontend
       run: npm ci
 
+    - name: Install Playwright Dependencies (Amazon Linux 2023)
+      run: |
+        sudo dnf install -y alsa-lib at-spi2-atk atk cups-libs dbus-libs expat libX11 libXcomposite libXcursor libXdamage libXext libXfixes libXi libXrandr libXrender libXScrnSaver libXtst pango mesa-libgbm nspr nss nss-util libxkbcommon libX11-xcb libxcb libdrm gtk3
+
     - name: Install Playwright Browsers
       working-directory: ./promptprotectfrontend
-      run: npx playwright install --with-deps
+      run: npx playwright install chromium
 
     - name: Create Frontend .env
       working-directory: ./promptprotectfrontend
       run: |
-        echo "${{ secrets.FRONTEND_ENV }}" > .env
+        cat << 'EOF' > .env
+        ${{ secrets.FRONTEND_ENV }}
+        EOF
 
     - name: Run Frontend Tests
       working-directory: ./promptprotectfrontend

@@ -6,6 +6,8 @@ require('dotenv').config();
 const BASE_URL = process.env.BASE_URL;
 const MONGODB_URI = process.env.MONGODB_URI;
 
+console.log(MONGODB_URI);
+
 // User Models (Minimal for verification)
 const UserSchema = new mongoose.Schema({}, { strict: false });
 const User = mongoose.model('User', UserSchema);
@@ -47,9 +49,13 @@ async function runTests() {
     console.log('Starting Expanded 26-Step API Flow Test Suite...');
 
     try {
-        if (MONGODB_URI) await mongoose.connect(MONGODB_URI);
+        if (MONGODB_URI) {
+            await mongoose.connect(MONGODB_URI);
+            console.log(`[DEBUG] Mongoose Connected to: ${mongoose.connection.name}`);
+            const collections = await mongoose.connection.db.listCollections().toArray();
+            console.log(`[DEBUG] Available collections: ${collections.map(c => c.name).join(', ')}`);
+        }
 
-        // 1. Signup
         const signupRes = await client.post('/api/org/signup', {
             userName: 'Primary Admin',
             userEmail: adminEmail,
@@ -62,7 +68,9 @@ async function runTests() {
         if (signupRes.status !== 201) throw new Error('Signup failed');
 
         // 2. Verify Email (Simulated)
+        console.log(adminEmail);
         const user1 = await User.findOne({ userEmail: adminEmail });
+        console.log(user1);
         const verifyRes = await client.get(`/api/users/auth/verify-email?token=${user1.verificationToken}`);
         logResult('/api/users/auth/verify-email', 'GET', verifyRes.status === 200, verifyRes.status, verifyRes.data, 'Email Verification');
 

@@ -128,6 +128,7 @@ app.get("/extensions/promptprotect_extension.crx", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
+  console.log("helth endpoint hit");
   res.status(200).send("OK");
 });
 
@@ -150,7 +151,7 @@ app.post("/pii-scan", async (req, res) => {
     const userId = user?._id?.toString() || null;
     const userRole = user?.userRole?.[0] || "DEFAULT";
 
-    const result = await runPcan({
+    const result = await runPiiScan({
       apiKey,
       userEmail,
       ...req.body

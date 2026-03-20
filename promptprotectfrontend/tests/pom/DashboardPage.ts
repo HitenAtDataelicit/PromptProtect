@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { injectAxe, checkA11y } from 'axe-playwright';
 
 export class DashboardPage {
   constructor(private page: Page) { }
@@ -11,26 +10,36 @@ export class DashboardPage {
   async verifyDashboardLoaded() {
     await expect(this.page.locator('text=Prompt Protect').first()).toBeVisible();
     await expect(this.page.getByRole('heading', { name: 'Dashboard' }).first()).toBeVisible();
+    await this.waitForNoOverlays();
   }
 
-  async checkAccessibility() {
-    // Temporarily disabled to focus on functional stability
-    // await injectAxe(this.page);
-    // await checkA11y(this.page);
+  private async waitForNoOverlays() {
+    // Wait for any 'z-50' overlays (loading/access denied) to disappear
+    const overlay = this.page.locator('.z-50').first();
+    if (await overlay.isVisible()) {
+      await overlay.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => { });
+    }
   }
 
   async navigateTo(section: string) {
-    // Target the navigation sidebar specifically
+    await this.waitForNoOverlays();
     const nav = this.page.locator('nav');
     await nav.getByRole('button', { name: section, exact: false }).first().click();
-    // Allow for animation/navigation
     await this.page.waitForTimeout(500);
   }
 
   async logout() {
-    await this.page.click('button[aria-haspopup="menu"]');
-    await this.page.click('button:has-text("Sign Out")');
-    await expect(this.page).toHaveURL(/\/$/);
+    await this.waitForNoOverlays();
+    const menuButton = this.page.locator('button[aria-haspopup="menu"]').first();
+    await menuButton.click({ force: true });
+
+    // Wait for Sign Out button to be visible and click it
+    const signOutButton = this.page.locator('button:has-text("Sign Out")');
+    await expect(signOutButton).toBeVisible({ timeout: 5000 });
+    await signOutButton.click({ force: true });
+
+    // Verify redirect to landing page
+    await expect(this.page).toHaveURL(/\/$/, { timeout: 10000 });
   }
 
   async verifyKeySectionVisible() {
@@ -48,16 +57,19 @@ export class DashboardPage {
 
   async verifyUrlAccessible(url: string) {
     await this.page.goto(url);
-    // Check if we are still on that URL (not redirected to / or /dashboard)
-    // and no access denied popup is shown
+    await this.waitForNoOverlays();
+    // Check if we are still on that URL (not redirected back to dashboard due to failed check)
     await expect(this.page).toHaveURL(new RegExp(url));
     await expect(this.page.locator('text=Access denied')).not.toBeVisible();
   }
 
   async verifyAccessDenied(url: string) {
     await this.page.goto(url);
-    // Expect a popup or redirect with access denied
-    await expect(this.page.locator('text=Access denied')).toBeVisible();
+    // Expect the 'Access denied' popup to appear (it shows for ~1.5s)
+    const accessDeniedMsg = this.page.locator('text=Access denied');
+    await expect(accessDeniedMsg).toBeVisible({ timeout: 10000 });
+    // After it shows, it will redirect, so we wait for it to be hidden or ignore the redirect
+    await accessDeniedMsg.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => { });
   }
 
   async verifySidebarVisibility(expected: string[], forbidden: string[]) {

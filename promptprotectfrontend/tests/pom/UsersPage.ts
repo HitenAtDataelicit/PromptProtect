@@ -21,18 +21,14 @@ export class UsersPage {
     // The role list in the app is uppercase: ADMIN, USER_MANAGER, etc.
     await modal.locator('button:has-text("Select roles...")').click();
     await this.page.locator('role=listbox').locator(`button:has-text("${role}")`).click();
-    // Click outside or press Escape to close the dropdown if needed, 
-    // but typically clicking an option might not close it in MultiSelect.
-    // However, our MultiSelectDropdown.tsx toggleSelect doesn't close on click.
-    // Let's press Escape to be safe.
     await this.page.keyboard.press('Escape');
 
     // 4. Click the submit button inside the modal
     await modal.locator('button:has-text("Add User")').click();
+    await modal.waitFor({ state: 'hidden', timeout: 5000 });
 
     await expect(this.page.locator(`text=${name}`)).toBeVisible();
   }
-
   async deleteUser(name: string) {
     const row = this.page.locator('tr', { hasText: name });
     await row.locator('button:has-text("Delete")').click();

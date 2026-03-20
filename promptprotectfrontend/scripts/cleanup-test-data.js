@@ -14,20 +14,14 @@ async function cleanup() {
     await mongoose.connect(MONGODB_URI);
     console.log("Cleaning up test data in MongoDB...");
 
-    // Remove users and orgs related to the test workspace
-    const Org = mongoose.model("Organization", new mongoose.Schema({ workspace: String }));
-    const User = mongoose.model("User", new mongoose.Schema({ org: mongoose.Schema.Types.ObjectId, userEmail: String }));
+    // Remove all organizations and users related to E2E tests
+    const Org = mongoose.models.Organization || mongoose.model("Organization", new mongoose.Schema({ workspace: String }));
+    const User = mongoose.models.User || mongoose.model("User", new mongoose.Schema({ org: mongoose.Schema.Types.ObjectId, userEmail: String }));
 
-    const targetWorkspace = process.env.TEST_WORKSPACE || "acme_corp";
-    const org = await Org.findOne({ workspace: targetWorkspace });
-    if (org) {
-      await User.deleteMany({ org: org._id });
-      await Org.deleteOne({ _id: org._id });
-      console.log(`Deleted org '${targetWorkspace}' and its users.`);
-    }
-    
-    await User.deleteMany({ userEmail: /test\.com$/i });
-    console.log("Deleted all users with @test.com emails.");
+    const oRes = await Org.deleteMany({ workspace: /^e2e_ws_/ });
+    const uRes = await User.deleteMany({ userEmail: { $regex: /mail\.com$|test\.com$/ } });
+
+    console.log(`Cleanup complete: Deleted ${oRes.deletedCount} organizations and ${uRes.deletedCount} users.`);
 
   } catch (err) {
     console.error("Error during cleanup:", err);
