@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { injectAxe, checkA11y } from 'axe-playwright';
 
 export class DashboardPage {
   constructor(private page: Page) { }
@@ -13,31 +12,20 @@ export class DashboardPage {
     await expect(this.page.getByRole('heading', { name: 'Dashboard' }).first()).toBeVisible();
   }
 
-  async checkAccessibility() {
-    // Temporarily disabled to focus on functional stability
-    // await injectAxe(this.page);
-    // await checkA11y(this.page);
-  }
-
   async navigateTo(section: string) {
-    // Target the navigation sidebar specifically
     const nav = this.page.locator('nav');
     await nav.getByRole('button', { name: section, exact: false }).first().click();
-    // Allow for animation/navigation
     await this.page.waitForTimeout(500);
   }
 
   async logout() {
-    // Click the profile/name button to open menu
     const menuButton = this.page.locator('button[aria-haspopup="menu"]').first();
     await menuButton.click();
 
-    // Wait for Sign Out button to be visible and click it
     const signOutButton = this.page.locator('button:has-text("Sign Out")');
     await expect(signOutButton).toBeVisible({ timeout: 5000 });
     await signOutButton.click();
 
-    // Verify redirect to landing page
     await expect(this.page).toHaveURL(/\/$/);
   }
 

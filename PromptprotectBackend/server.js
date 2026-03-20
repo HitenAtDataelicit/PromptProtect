@@ -151,7 +151,7 @@ app.post("/pii-scan", async (req, res) => {
     const userId = user?._id?.toString() || null;
     const userRole = user?.userRole?.[0] || "DEFAULT";
 
-    const result = await runPcan({
+    const result = await runPiiScan({
       apiKey,
       userEmail,
       ...req.body
