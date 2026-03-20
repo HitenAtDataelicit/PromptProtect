@@ -29,6 +29,7 @@ export class UsersPage {
 
     // 4. Click the submit button inside the modal
     await modal.locator('button:has-text("Add User")').click();
+    await modal.waitFor({ state: 'hidden', timeout: 5000 });
 
     await expect(this.page.locator(`text=${name}`)).toBeVisible();
   }
