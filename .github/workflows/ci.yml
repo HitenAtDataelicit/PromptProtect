@@ -9,8 +9,8 @@ on:
 jobs:
   test:
     name: Test and Verify
-    # Run tests ONLY on push/PR to stage branch
-    if: github.event.ref == 'refs/heads/stage' || github.base_ref == 'stage'
+    # Run tests on push/PR involving the stage branch
+    if: github.ref_name == 'stage' || github.base_ref == 'stage' || github.head_ref == 'stage'
     runs-on: [self-hosted, Stage]
     steps:
     - uses: actions/checkout@v4
