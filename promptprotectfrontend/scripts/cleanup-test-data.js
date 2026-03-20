@@ -25,7 +25,7 @@ async function cleanup() {
       await Org.deleteOne({ _id: org._id });
       console.log(`Deleted org '${targetWorkspace}' and its users.`);
     }
-    
+
     await User.deleteMany({ userEmail: /test\.com$/i });
     console.log("Deleted all users with @test.com emails.");
 

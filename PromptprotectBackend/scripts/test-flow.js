@@ -188,12 +188,12 @@ async function runTests() {
         });
         logResult('/pii-scan', 'POST', scanRes.status === 200, scanRes.status, scanRes.data, 'Final PII Detection');
 
-        // // 18. Delete Resources
-        // if (groupId) await client.delete(`/api/groups/${groupId}`);
-        // if (policyId) await client.delete(`/api/policies/${policyId}`);
-        // if (testUserId) await client.delete(`/api/users/${testUserId}`);
-        // if (customRuleId) await client.delete(`/api/custom-rules/${customRuleId}`);
-        // logResult('Cleanup', 'DELETE', true, 200, {}, 'Resource Disposal');
+        // 18. Delete Resources
+        if (groupId) await client.delete(`/api/groups/${groupId}`);
+        if (policyId) await client.delete(`/api/policies/${policyId}`);
+        if (testUserId) await client.delete(`/api/users/${testUserId}`);
+        if (customRuleId) await client.delete(`/api/custom-rules/${customRuleId}`);
+        logResult('Cleanup', 'DELETE', true, 200, {}, 'Resource Disposal');
 
         // 19. Create New User (Admin Role)
         const createAdminRes = await client.post('/api/users', {
@@ -272,12 +272,11 @@ async function runTests() {
         if (failCount === 0 && results.length > 0) {
             console.log('All tests passed! Cleaning up...');
             if (mongoose.connection.readyState === 1) {
-                // await mongoose.connection.db.dropDatabase();
-                // console.log('Test database dropped.');
-                console.log("skiping")
+                await mongoose.connection.db.dropDatabase();
+                console.log('Test database dropped.');
             }
             if (fs.existsSync('test_results.json')) {
-                // fs.unlinkSync('test_results.json');
+                fs.unlinkSync('test_results.json');
                 console.log('test_results.json removed.');
             }
         } else {
