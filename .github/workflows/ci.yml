@@ -31,6 +31,7 @@ jobs:
       working-directory: ./PromptprotectBackend
       run: |
         echo "${{ secrets.BACKEND_ENV }}" > .env
+        echo "" >> .env
         # Override for the server's local environment
         echo "BASE_URL=http://localhost:5005" >> .env
 
@@ -46,16 +47,23 @@ jobs:
 
     - name: Run Backend Tests
       working-directory: ./PromptprotectBackend
-      run: node scripts/test-flow.js
+      run: |
+        echo "Contents of .env:"
+        cat .env
+        node scripts/test-flow.js
 
     # Frontend Setup & Test
     - name: Install Frontend Dependencies
       working-directory: ./promptprotectfrontend
       run: npm ci
 
+    - name: Install Playwright Dependencies (Amazon Linux 2023)
+      run: |
+        sudo dnf install -y alsa-lib at-spi2-atk atk cups-libs dbus-libs expat libX11 libXcomposite libXcursor libXdamage libXext libXfixes libXi libXrandr libXrender libXScrnSaver libXtst pango mesa-libgbm nspr nss nss-util
+
     - name: Install Playwright Browsers
       working-directory: ./promptprotectfrontend
-      run: npx playwright install --with-deps
+      run: npx playwright install chromium
 
     - name: Create Frontend .env
       working-directory: ./promptprotectfrontend
