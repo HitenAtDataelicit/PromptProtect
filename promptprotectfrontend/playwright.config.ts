@@ -25,7 +25,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    
+
     /* Run headless in CI/EC2 environments */
     headless: true,
   },
@@ -34,7 +34,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
       },
     },
@@ -45,12 +45,12 @@ export default defineConfig({
     {
       command: 'npm run dev',
       url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true,
     },
     {
       command: 'npm --prefix ../PromptprotectBackend run start',
       url: 'http://localhost:5005/health',
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true,
     }
   ],
 });
